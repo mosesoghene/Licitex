@@ -1,3 +1,4 @@
+from dj_rest_auth.views import PasswordResetView, PasswordResetConfirmView
 from django.contrib import admin
 from django.urls import path, include
 
@@ -22,6 +23,9 @@ urlpatterns = [
 
     path('auth/', include('dj_rest_auth.urls')),
     path('auth/registration/', include('dj_rest_auth.registration.urls')),
+
+    path('auth/password/reset/', PasswordResetView.as_view(), name='password_reset'),
+    path('auth/password/reset/confirm/<str:uidb64>/<str:token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger', schema_view.with_ui('swagger', cache_timeout=0,), name='schema-swagger-ui'),
