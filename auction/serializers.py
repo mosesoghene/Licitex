@@ -1,5 +1,6 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Bid, AuctionItem
+from .models import Bid, AuctionItem, Category
 from django.utils import timezone
 
 
@@ -43,3 +44,20 @@ class BidSerializer(serializers.ModelSerializer):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
 
+
+User = get_user_model()
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'slug')
+
+class AuctionItemSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    winner = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = AuctionItem
+        fields = ('id', 'item_name', 'starting_bid', 'current_bid',
+                  'auction_start', 'auction_end', 'category', 'winner',)
+        read_only_fields = ('id', 'winner', 'current_bid')
