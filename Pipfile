@@ -16,6 +16,8 @@ gunicorn = "*"
 requests = "*"
 django-environ = "*"
 python-dotenv = "*"
+djongo = "*"
+pymongo = "*"
 
 [dev-packages]
 

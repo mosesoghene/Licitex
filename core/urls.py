@@ -27,6 +27,8 @@ urlpatterns = [
     path('auth/password/reset/', PasswordResetView.as_view(), name='password_reset'),
     path('auth/password/reset/confirm/<str:uidb64>/<str:token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 
+    path('auction/', include('auction.urls')),
+
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger', schema_view.with_ui('swagger', cache_timeout=0,), name='schema-swagger-ui'),
 

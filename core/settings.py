@@ -106,6 +106,18 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'djongo',
+#         'NAME': 'auction',
+#         'ENFORCE_SCHEMA': False,
+#         'CLIENT': {
+#             'host': 'mongodb://localhost:27017',
+#         }
+#     }
+# }
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -150,24 +162,30 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_LOGIN_METHODS  = {
+    'username': {'required': False},
+    'email': {'required': True},
+}
+# ACCOUNT_SIGNUP_FIELDS = {'email*', 'password1*', 'password2*'}
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_SIGNUP_FIELDS = {
+    'username': {'required': False},
+    'email': {'required': True},
+}
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = env('EMAIL_HOST')
-EMAIL_PORT = env('EMAIL_PORT')
-EMAIL_USE_TLS = env('EMAIL_USE_TLS')
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = env('EMAIL_HOST')
+# EMAIL_PORT = env('EMAIL_PORT')
+# EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+# EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+# DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
