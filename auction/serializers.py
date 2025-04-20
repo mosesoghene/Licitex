@@ -32,10 +32,16 @@ class BidSerializer(serializers.ModelSerializer):
         try:
             auction_item = AuctionItem.objects.get(id=item)
             current_price = auction_item.current_bid or auction_item.starting_bid
+            auction_start = auction_item.auction_start
+            auction_end = auction_item.auction_end
+            current_time = timezone.now()
+
+            if auction_start < current_time > auction_end:
+                raise serializers.ValidationError("Bidding for auction item is not allowed at this time")
+
             if value <= current_price:
-                raise serializers.ValidationError(
-                    f"Bid must be higher than current price of {current_price}"
-                )
+                raise serializers.ValidationError(f"Bid must be higher than current price of {current_price}")
+
         except AuctionItem.DoesNotExist:
             raise serializers.ValidationError("Invalid auction item")
         return value
@@ -45,8 +51,8 @@ class BidSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-User = get_user_model()
 
+User = get_user_model()
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category

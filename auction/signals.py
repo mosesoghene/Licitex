@@ -9,19 +9,10 @@ from django.db import transaction
 @receiver(post_save, sender=Bid)
 def update_current_bid(sender, instance, created, **kwargs):
     if created:
-        try:
-            with (transaction.atomic()):
-                AuctionItem.objects \
-                .filter(pk=instance.item.pk,)\
-                .update(
-                    current_bid=Case(
-                        When(
-                            current_bid__lt=instance.amount,
-                            then=Value(instance.amount)
-                        ),
-                        default=F('current_bid')
-                    )
-                )
-        except Exception as e:
-            logger.error(f"Bid update failed: {str(e)}")
-
+        with transaction.atomic():
+            updated_rows = AuctionItem.objects.filter(pk=instance.item.pk).update(
+                current_bid=instance.amount,
+                winner=instance.user,
+            )
+            if updated_rows != 1:
+                raise ValueError(f"Failed to update current_bid for AuctionItem {instance.item.pk}")
