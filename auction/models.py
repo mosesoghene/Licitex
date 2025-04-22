@@ -71,9 +71,7 @@ class Bid(models.Model):
             current_price = self.item.current_bid or self.item.starting_bid
 
             if self.amount <= current_price:
-                raise ValidationError(
-                    f"Bid must be higher than {current_price:.2f}"
-                )
+                raise ValidationError(f"Bid must be higher than {current_price:.2f}")
 
     def save(self, *args, **kwargs):
         self.full_clean()
