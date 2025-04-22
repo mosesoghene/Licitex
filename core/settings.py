@@ -3,6 +3,7 @@ from datetime import timedelta
 from pathlib import Path
 from urllib.parse import urlparse
 
+import dj_database_url
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -120,16 +121,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # }
 
 # Live database configuration
-live_db_details = urlparse(os.getenv("DATABASE_URL"))
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': live_db_details.path.replace('/', ''),
-        'USER': live_db_details.username,
-        'PASSWORD': live_db_details.password,
-        'HOST': live_db_details.hostname,
-        'PORT': 5432,
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 # Password validation

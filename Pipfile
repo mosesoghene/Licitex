@@ -18,6 +18,7 @@ django-environ = "*"
 python-dotenv = "*"
 djongo = "*"
 pymongo = "*"
+dj-database-url = "*"
 
 [dev-packages]
 
