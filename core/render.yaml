@@ -3,7 +3,7 @@ services:
     name: core
     env: python
     buildCommand: |
-      pip install -r requirements.txt
+      pip install -e .  # Install in development mode
       python manage.py migrate
       python manage.py collectstatic --noinput
     startCommand: gunicorn Licitex.core.wsgi:application
@@ -12,4 +12,6 @@ services:
         generateValue: true
       - key: DEBUG
         value: "False"
+      - key: PYTHONPATH
+        value: /opt/render/project/sr
 
