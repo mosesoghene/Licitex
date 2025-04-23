@@ -20,15 +20,15 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('', include('auction.urls')),
-    path('admin/', admin.site.urls),
+    path('api/auction/', include('auction.urls')),
+    path('api/admin/', admin.site.urls),
 
-    path('auth/', include('dj_rest_auth.urls')),
-    path('auth/registration/', include('dj_rest_auth.registration.urls')),
-    path('auth/password/reset/', PasswordResetView.as_view(), name='password_reset'),
-    path('auth/password/reset/confirm/<str:uidb64>/<str:token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('api/auth/', include('dj_rest_auth.urls')),
+    path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
+    path('api/auth/password/reset/', PasswordResetView.as_view(), name='password_reset'),
+    path('api/auth/password/reset/confirm/<str:uidb64>/<str:token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 
-    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0,), name='schema-swagger-ui'),
+    path('<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('', schema_view.with_ui('swagger', cache_timeout=0,), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0,), name='schema-redoc'),
 ]
