@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.utils.text import slugify
 from rest_framework import serializers
 from .models import Bid, AuctionItem, Category
 from django.utils import timezone
@@ -47,10 +48,8 @@ class BidSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
+        validated_data['user'] = self.context['request'].user.username
         return super().create(validated_data)
-
-
 
 User = get_user_model()
 class CategorySerializer(serializers.ModelSerializer):
@@ -65,5 +64,42 @@ class AuctionItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuctionItem
         fields = ('id', 'item_name', 'starting_bid', 'current_bid',
-                  'auction_start', 'auction_end', 'category', 'winner',)
-        read_only_fields = ('id', 'winner', 'current_bid')
+                  'auction_start', 'auction_end', 'category', 'winner', 'creator')
+        read_only_fields = ('id', 'item_name', 'auction_start', 'auction_end', 'winner', 'current_bid')
+
+
+class AuctionItemCreateSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(max_length=100)
+
+    class Meta:
+        model = AuctionItem
+        fields = ('item_name', 'starting_bid', 'auction_start', 'auction_end', 'category')
+
+    def validate_category(self, value):
+        return value.strip().title()
+
+    def validate(self, data):
+        if data['auction_start'] >= data['auction_end']:
+            raise serializers.ValidationError("Auction end must be after start time")
+
+        if data['auction_start'] < timezone.now():
+            raise serializers.ValidationError("Auction cannot start in the past")
+
+        if data['starting_bid'] <= 0:
+            raise serializers.ValidationError("Starting bid must be positive")
+
+        return data
+
+    def create(self, validated_data):
+        category_name = validated_data.pop('category')
+
+        category, created = Category.objects.get_or_create(
+            name=category_name,
+            defaults={'slug': slugify(category_name)}
+        )
+
+        return AuctionItem.objects.create(
+            category=category,
+            creator=self.context['request'].user,
+            **validated_data
+        )

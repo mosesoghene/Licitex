@@ -3,7 +3,6 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.core.exceptions import ValidationError
 
-
 # Create your models here.
 class AuctionItem(models.Model):
     item_name = models.CharField(max_length=100)
@@ -12,7 +11,19 @@ class AuctionItem(models.Model):
     auction_start = models.DateTimeField()
     auction_end = models.DateTimeField()
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
-    winner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    creator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_DEFAULT,
+        default=1,
+        related_name='auction_item_creator'
+    )
+    winner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='auction_item_winner'
+    )
 
     def __str__(self):
         return f"{self.item_name} | {self.category.name}"
@@ -62,16 +73,10 @@ class Bid(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
-        """
-        Ensures bid amount exceeds current price and starting bid
-        """
         super().clean()
-
         if not self.id:
             current_price = self.item.current_bid or self.item.starting_bid
-
-            if self.amount <= current_price:
-                raise ValidationError(f"Bid must be higher than {current_price:.2f}")
+            if self.amount <= current_price: raise ValidationError(f"Bid must be higher than {current_price:.2f}")
 
     def save(self, *args, **kwargs):
         self.full_clean()
